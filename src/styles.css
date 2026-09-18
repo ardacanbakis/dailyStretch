@@ -42,6 +42,25 @@
   }
 }
 
+:root[data-theme='dark'] {
+    --bg: #14181a;
+    --surface: #1d2326;
+    --surface-2: #252c30;
+    --border: #2f383d;
+    --text: #eef1ef;
+    --muted: #9aa5a0;
+    --accent: #5cc4a9;
+    --accent-strong: #7fd6be;
+    --accent-soft: #1e3a33;
+    --warn: #e0ac52;
+    --warn-soft: #3d3120;
+    --danger: #e7776f;
+    --danger-soft: #3f2422;
+    --ok: #6ccf8f;
+    --ok-soft: #1f3a2a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+
 * {
   box-sizing: border-box;
 }

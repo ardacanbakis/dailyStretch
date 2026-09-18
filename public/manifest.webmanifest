@@ -6,5 +6,8 @@
   "background_color": "#f6f4ef",
   "theme_color": "#1f6f5f",
   "description": "A neck-first mobility routine system for remote work.",
-  "icons": []
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "./apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
 }
