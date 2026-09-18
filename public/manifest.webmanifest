@@ -1,0 +1,10 @@
+{
+  "name": "DailyStretch",
+  "short_name": "Stretch",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#1f6f5f",
+  "description": "A neck-first mobility routine system for remote work.",
+  "icons": []
+}
