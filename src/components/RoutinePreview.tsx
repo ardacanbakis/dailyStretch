@@ -7,6 +7,7 @@ import { applySwap, removeItem } from '../engine/swap';
 import type { OpenDetail } from '../App';
 import { SwapSheet } from './SwapSheet';
 import { ExerciseMeta, NoteList, fmtMin, useEngineContext } from './common';
+import { FigureThumb } from '../figure/Figure';
 
 interface Props {
   routine: Routine;
@@ -64,7 +65,10 @@ export function RoutinePreview({ routine, request, openDetail, onChange, onRegen
                   </div>
                 )}
                 <div className="list-item" style={{ alignItems: 'flex-start' }}>
-                  <span className="num">{index + 1}</span>
+                  <div className="stack-sm" style={{ alignItems: 'center' }}>
+                    <span className="num">{index + 1}</span>
+                    <FigureThumb exerciseId={e.id} large />
+                  </div>
                   <div className="grow stack-sm">
                     <button
                       className="title"

@@ -5,6 +5,7 @@ import { EXERCISES } from '../data/exercises';
 import { useAppState } from '../state/store';
 import type { OpenDetail } from '../App';
 import { Chip, ExerciseMeta, fmtMin } from './common';
+import { FigureThumb } from '../figure/Figure';
 
 type Duration = 'all' | 'short' | 'medium' | 'long';
 type NeckFilter = 'all' | 'friendly' | 'focused';
@@ -164,6 +165,7 @@ export function Library({ openDetail }: { openDetail: OpenDetail }) {
             const fb = state.feedback[e.id];
             return (
               <button key={e.id} className="list-item" style={{ cursor: 'pointer', textAlign: 'left', alignItems: 'flex-start' }} onClick={() => openDetail(e.id)}>
+                <FigureThumb exerciseId={e.id} large />
                 <div className="grow stack-sm">
                   <div className="row between">
                     <span className="title">

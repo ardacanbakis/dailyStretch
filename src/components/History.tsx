@@ -5,6 +5,7 @@ import { actions, useAppState } from '../state/store';
 import { computeStats } from '../state/stats';
 import type { OpenDetail } from '../App';
 import { fmtClock, fmtDate, fmtMin, fmtTime } from './common';
+import { FigureThumb } from '../figure/Figure';
 
 const TYPE_ORDER: SessionType[] = ['micro', 'short', 'full', 'deep'];
 const TYPE_HINT: Record<SessionType, string> = { micro: '< 5 min', short: '5-10 min', full: '10-20 min', deep: '20+ min' };
@@ -89,10 +90,12 @@ export function History({ openDetail }: { openDetail: OpenDetail }) {
       {stats.topExercises.length > 0 && (
         <div className="card stack-sm">
           <h3>Most practised</h3>
-          <div className="chip-row">
+          <div className="list">
             {stats.topExercises.map((t) => (
-              <button key={t.id} className="chip sm" onClick={() => openDetail(t.id)}>
-                {t.name} · {t.count}
+              <button key={t.id} className="list-item" style={{ cursor: 'pointer', textAlign: 'left' }} onClick={() => openDetail(t.id)}>
+                <FigureThumb exerciseId={t.id} />
+                <div className="grow title">{t.name}</div>
+                <span className="badge accent">{t.count}×</span>
               </button>
             ))}
           </div>

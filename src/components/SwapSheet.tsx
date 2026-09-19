@@ -4,6 +4,7 @@ import { getExercise } from '../data/exercises';
 import { getAlternatives } from '../engine/swap';
 import type { OpenDetail } from '../App';
 import { ExerciseMeta, Sheet, fmtMin, useEngineContext } from './common';
+import { FigureThumb } from '../figure/Figure';
 
 interface Props {
   open: boolean;
@@ -34,6 +35,7 @@ export function SwapSheet({ open, routine, index, request, onClose, onPick, open
             <div className="list">
               {alternatives.map((e) => (
                 <div key={e.id} className="list-item" style={{ alignItems: 'flex-start' }}>
+                  <FigureThumb exerciseId={e.id} large />
                   <div className="grow stack-sm">
                     <div className="title">{e.name}</div>
                     <div className="small muted">{e.summary}</div>

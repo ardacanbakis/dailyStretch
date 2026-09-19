@@ -7,6 +7,7 @@ import { routineDurationSec } from '../engine/generator';
 import type { OpenDetail } from '../App';
 import { SwapSheet } from './SwapSheet';
 import { Chip, Toggle, fmtClock, fmtMin } from './common';
+import { ExerciseFigure, FigureThumb } from '../figure/Figure';
 
 type Feedback = NonNullable<SessionItemRecord['feedback']>;
 
@@ -51,6 +52,7 @@ export function SessionPlayer({ routine: initial, request, openDetail, onDone }:
   const [swapOpen, setSwapOpen] = useState(false);
   const [phase, setPhase] = useState<'active' | 'summary'>('active');
   const [neckWorse, setNeckWorse] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
   const [feel, setFeel] = useState<number | undefined>(undefined);
   const [note, setNote] = useState('');
   const startedAt = useRef(Date.now());
@@ -186,6 +188,7 @@ export function SessionPlayer({ routine: initial, request, openDetail, onDone }:
               const e = getExercise(r.exerciseId);
               return (
                 <div key={`${r.exerciseId}-${i}`} className={`list-item ${r.outcome === 'skipped' ? 'done' : ''}`} style={{ alignItems: 'flex-start' }}>
+                  <FigureThumb exerciseId={r.exerciseId} />
                   <div className="grow stack-sm">
                     <div className="row between">
                       <span className="title">{e?.name ?? r.exerciseId}</span>
@@ -282,22 +285,29 @@ export function SessionPlayer({ routine: initial, request, openDetail, onDone }:
       <div className="stack-sm" style={{ textAlign: 'center' }}>
         <div className="label">{item.block}</div>
         <h1>{exercise.name}</h1>
-        <div className="row wrap" style={{ justifyContent: 'center' }}>
-          <span className="badge">{exercise.positions.map((p) => POSITION_LABELS[p]).join(' / ')}</span>
-          <span className="badge accent">{exercise.reps}</span>
-          {exercise.perSide && <span className="badge warn">Switch sides halfway</span>}
-        </div>
       </div>
 
-      <div className="timer">
-        <svg className="ring" viewBox="0 0 160 160" aria-hidden>
-          <circle className="track" cx="80" cy="80" r={RING_R} fill="none" strokeWidth="10" />
-          <circle className="arc" cx="80" cy="80" r={RING_R} fill="none" strokeWidth="10" strokeDasharray={RING_C} strokeDashoffset={RING_C * (1 - progress)} transform="rotate(-90 80 80)" />
-          <text x="80" y="88" textAnchor="middle" fontSize="34" fontWeight="700" fill="currentColor" className={`digits ${running ? '' : 'paused'}`}>
-            {fmtClock(remaining)}
-          </text>
-        </svg>
-        <div className="small muted">{running ? (exercise.perSide && progress >= 0.5 ? 'Second side' : 'Keep breathing') : 'Paused'}</div>
+      <div className="session-visual">
+        <div className="side-by-side">
+          <div className="figure-stage">
+            <ExerciseFigure exerciseId={exercise.id} playing={running} />
+          </div>
+          <div className="timer">
+            <svg className="ring" viewBox="0 0 160 160" aria-hidden>
+              <circle className="track" cx="80" cy="80" r={RING_R} fill="none" strokeWidth="10" />
+              <circle className="arc" cx="80" cy="80" r={RING_R} fill="none" strokeWidth="10" strokeDasharray={RING_C} strokeDashoffset={RING_C * (1 - progress)} transform="rotate(-90 80 80)" />
+              <text x="80" y="88" textAnchor="middle" fontSize="34" fontWeight="700" fill="currentColor" className={`digits ${running ? '' : 'paused'}`}>
+                {fmtClock(remaining)}
+              </text>
+            </svg>
+          </div>
+        </div>
+        <div className="cue">{running ? exercise.demo[stepIdx] : 'Paused'}</div>
+        <div className="row wrap" style={{ justifyContent: 'center' }}>
+          <span className="badge accent">{exercise.reps}</span>
+          <span className="badge">{exercise.positions.map((p) => POSITION_LABELS[p]).join(' / ')}</span>
+          {exercise.perSide && <span className="badge warn">{progress >= 0.5 ? 'Second side' : 'Switch sides halfway'}</span>}
+        </div>
       </div>
 
       <div className="controls">
@@ -323,29 +333,27 @@ export function SessionPlayer({ routine: initial, request, openDetail, onDone }:
         </button>
       </div>
 
-      <div className="card stack-sm">
-        <div className="demo-steps" aria-label="Demonstration">
-          {exercise.demo.map((d, i) => (
-            <div key={i} className={`demo-step ${i === stepIdx ? 'current' : ''}`}>
-              <span className="n">{i + 1}</span>
-              {d}
-            </div>
-          ))}
-        </div>
-        <ol className="steps">
-          {exercise.instructions.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ol>
-        <div className="small">
-          <strong>Breathing:</strong> {exercise.breathing}
-        </div>
-        {exercise.cautions.length > 0 && (
-          <div className="small" style={{ color: 'var(--warn)' }}>
-            <strong>Care:</strong> {exercise.cautions.join(' ')}
+      <button className="details-toggle" onClick={() => setShowSteps((v) => !v)} aria-expanded={showSteps}>
+        {showSteps ? 'Hide written steps' : 'Show written steps'}
+      </button>
+
+      {showSteps && (
+        <div className="card stack-sm">
+          <ol className="steps">
+            {exercise.instructions.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+          <div className="small">
+            <strong>Breathing:</strong> {exercise.breathing}
           </div>
-        )}
-      </div>
+          {exercise.cautions.length > 0 && (
+            <div className="small" style={{ color: 'var(--warn)' }}>
+              <strong>Care:</strong> {exercise.cautions.join(' ')}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="card soft stack-sm">
         <div className="small muted">How is this one feeling?</div>
@@ -365,8 +373,9 @@ export function SessionPlayer({ routine: initial, request, openDetail, onDone }:
       </div>
 
       {next && (
-        <div className="small muted" style={{ textAlign: 'center' }}>
-          Up next: {next.name}
+        <div className="row" style={{ justifyContent: 'center' }}>
+          <FigureThumb exerciseId={next.id} />
+          <div className="small muted">Up next: {next.name}</div>
         </div>
       )}
 

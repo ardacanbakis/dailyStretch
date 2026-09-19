@@ -5,6 +5,7 @@ import { EXERCISES, getExercise } from '../data/exercises';
 import { actions, useAppState } from '../state/store';
 import { emptyFeedback } from '../engine/context';
 import { AreaTags, ExerciseMeta, Sheet, fmtMin } from './common';
+import { ExerciseFigure, FigureThumb } from '../figure/Figure';
 
 interface Props {
   exerciseId: string;
@@ -58,16 +59,16 @@ export function ExerciseDetail({ exerciseId, onClose, onOpen, onUseInstead, isOr
           </button>
         )}
 
-        <div className="card soft stack-sm">
-          <div className="label">Demonstration</div>
-          <div className="demo-steps">
-            {e.demo.map((d, i) => (
-              <div key={i} className="demo-step">
-                <span className="n">{i + 1}</span>
-                {d}
-              </div>
-            ))}
-          </div>
+        <div className="figure-stage full">
+          <ExerciseFigure exerciseId={e.id} />
+        </div>
+        <div className="demo-steps">
+          {e.demo.map((d, i) => (
+            <div key={i} className="demo-step">
+              <span className="n">{i + 1}</span>
+              {d}
+            </div>
+          ))}
         </div>
 
         <Section title="Target areas">
@@ -156,6 +157,7 @@ export function ExerciseDetail({ exerciseId, onClose, onOpen, onUseInstead, isOr
             <div className="list">
               {alternatives.map((a) => (
                 <div key={a.id} className="list-item">
+                  <FigureThumb exerciseId={a.id} large />
                   <div className="grow">
                     <div className="title">{a.name}</div>
                     <div className="small muted">{a.summary}</div>
