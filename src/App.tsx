@@ -9,6 +9,7 @@ import { Library } from './components/Library';
 import { History } from './components/History';
 import { Settings } from './components/Settings';
 import { ExerciseDetail } from './components/ExerciseDetail';
+import { WorkoutApp } from './components/workout/WorkoutApp';
 
 type Tab = 'home' | 'library' | 'history' | 'settings';
 type Flow = { kind: 'none' } | { kind: 'preview'; routine: Routine; request: RoutineRequest } | { kind: 'session'; routine: Routine; request: RoutineRequest };
@@ -78,16 +79,34 @@ export default function App() {
     );
   }
 
+  const mode = state.mode ?? 'mobility';
+
+  if (mode === 'workout') {
+    return (
+      <div className="app">
+        <header className="topbar">
+          <div className="brand">
+            <span className="dot" /> DailyStretch
+          </div>
+          <ModeSwitch mode={mode} />
+        </header>
+        <WorkoutApp />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="topbar">
         <div className="brand">
           <span className="dot" /> DailyStretch
         </div>
-        {flow.kind === 'preview' && (
+        {flow.kind === 'preview' ? (
           <button className="btn btn-ghost btn-sm" onClick={() => setFlow({ kind: 'none' })}>
             ← Back
           </button>
+        ) : (
+          <ModeSwitch mode={mode} />
         )}
       </header>
 
@@ -143,6 +162,19 @@ export default function App() {
             isOrigin={detail.id === detail.originId}
           />
         )}
+    </div>
+  );
+}
+
+function ModeSwitch({ mode }: { mode: 'mobility' | 'workout' }) {
+  return (
+    <div className="mode-switch" role="tablist" aria-label="App mode">
+      <button role="tab" aria-selected={mode === 'mobility'} className={mode === 'mobility' ? 'active' : ''} onClick={() => actions.setMode('mobility')}>
+        Mobility
+      </button>
+      <button role="tab" aria-selected={mode === 'workout'} className={mode === 'workout' ? 'active' : ''} onClick={() => actions.setMode('workout')}>
+        Workout
+      </button>
     </div>
   );
 }

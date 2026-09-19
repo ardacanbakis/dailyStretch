@@ -435,6 +435,8 @@ export interface DailyCheckInRecord {
 
 export interface AppState {
   version: number;
+  /** Which half of the app the user is in. */
+  mode?: 'mobility' | 'workout';
   profile: Profile;
   feedback: Record<string, ExerciseFeedback>;
   sessions: SessionRecord[];
@@ -443,6 +445,8 @@ export interface AppState {
   checkIns: DailyCheckInRecord[];
   /** Index of the last quick-desk-reset sub-focus used, for rotation. */
   deskResetCursor: number;
+  /** Strength-training side of the app. */
+  workout: import('./workout/types').WorkoutState;
 }
 
 export type SessionType = 'micro' | 'short' | 'full' | 'deep';

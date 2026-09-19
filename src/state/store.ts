@@ -9,9 +9,10 @@ import type {
   SessionRecord,
 } from '../types';
 import { dateKey, emptyFeedback } from '../engine/context';
+import { defaultWorkoutState, type WorkoutPlan, type WorkoutProfile, type WorkoutSession } from '../workout/types';
 
 export const STORAGE_KEY = 'dailystretch.state.v1';
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 const MAX_RECENT_ROUTINES = 30;
 const MAX_CHECKINS = 120;
 
@@ -35,12 +36,14 @@ export function defaultProfile(): Profile {
 export function defaultState(): AppState {
   return {
     version: STATE_VERSION,
+    mode: 'mobility',
     profile: defaultProfile(),
     feedback: {},
     sessions: [],
     recentRoutines: [],
     checkIns: [],
     deskResetCursor: -1,
+    workout: defaultWorkoutState(),
   };
 }
 
@@ -71,6 +74,11 @@ export function loadState(): AppState {
       recentRoutines: parsed.recentRoutines ?? [],
       checkIns: parsed.checkIns ?? [],
       deskResetCursor: parsed.deskResetCursor ?? -1,
+      workout: {
+        ...base.workout,
+        ...(parsed.workout ?? {}),
+        profile: { ...base.workout.profile, ...(parsed.workout?.profile ?? {}) },
+      },
     };
   } catch {
     return base;
@@ -219,6 +227,67 @@ export const actions = {
     setState((s) => ({ ...s, sessions: s.sessions.filter((x) => x.id !== id) }));
   },
 
+  setMode(mode: 'mobility' | 'workout'): void {
+    setState((s) => ({ ...s, mode }));
+  },
+
+  updateWorkoutProfile(patch: Partial<WorkoutProfile>): void {
+    setState((s) => ({ ...s, workout: { ...s.workout, profile: { ...s.workout.profile, ...patch } } }));
+  },
+
+  rememberWorkoutPlan(plan: WorkoutPlan): void {
+    setState((s) => {
+      const without = s.workout.recentPlans.filter((p) => p.id !== plan.id);
+      return { ...s, workout: { ...s.workout, recentPlans: [...without, plan].slice(-20) } };
+    });
+  },
+
+  recordWorkoutSession(record: WorkoutSession): void {
+    setState((s) => {
+      const lastWeight = { ...s.workout.lastWeight };
+      for (const item of record.items) {
+        const best = item.sets.filter((x) => x.done && x.weight > 0).map((x) => x.weight);
+        if (best.length) lastWeight[item.exerciseId] = Math.max(...best);
+      }
+      return {
+        ...s,
+        workout: {
+          ...s.workout,
+          lastWeight,
+          sessions: [...s.workout.sessions.filter((x) => x.id !== record.id), record],
+        },
+      };
+    });
+  },
+
+  deleteWorkoutSession(id: string): void {
+    setState((s) => ({ ...s, workout: { ...s.workout, sessions: s.workout.sessions.filter((x) => x.id !== id) } }));
+  },
+
+  toggleWorkoutFavorite(id: string): void {
+    setState((s) => {
+      const has = s.workout.favorites.includes(id);
+      return {
+        ...s,
+        workout: { ...s.workout, favorites: has ? s.workout.favorites.filter((x) => x !== id) : [...s.workout.favorites, id] },
+      };
+    });
+  },
+
+  toggleWorkoutExcluded(id: string): void {
+    setState((s) => {
+      const has = s.workout.excluded.includes(id);
+      return {
+        ...s,
+        workout: {
+          ...s.workout,
+          excluded: has ? s.workout.excluded.filter((x) => x !== id) : [...s.workout.excluded, id],
+          favorites: has ? s.workout.favorites : s.workout.favorites.filter((x) => x !== id),
+        },
+      };
+    });
+  },
+
   resetAll(): void {
     setState(() => defaultState());
   },
@@ -242,6 +311,11 @@ export const actions = {
         recentRoutines: parsed.recentRoutines ?? [],
         checkIns: parsed.checkIns ?? [],
         deskResetCursor: parsed.deskResetCursor ?? -1,
+        workout: {
+          ...base.workout,
+          ...(parsed.workout ?? {}),
+          profile: { ...base.workout.profile, ...(parsed.workout?.profile ?? {}) },
+        },
       }));
       return true;
     } catch {

@@ -1,4 +1,5 @@
 import type { AppState, Exercise, Profile, Routine, RoutineRequest } from '../../types';
+import { defaultWorkoutState } from '../../workout/types';
 import { EXERCISES } from '../../data/exercises';
 import type { EngineContext } from '../context';
 
@@ -73,5 +74,6 @@ export function emptyState(): AppState {
     recentRoutines: [],
     checkIns: [],
     deskResetCursor: -1,
+    workout: defaultWorkoutState(),
   };
 }

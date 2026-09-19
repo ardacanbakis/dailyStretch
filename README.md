@@ -1,5 +1,10 @@
 # DailyStretch
 
+Two apps in one: a neck-first **mobility** routine system and a **workout** tracker,
+switched from the header and sharing one install, one history and one set of preferences.
+
+## Mobility
+
 A personal, neck-first mobility and stretching routine system built for remote work.
 It behaves like a routine generator rather than a static list of stretches: every
 session is assembled from a large exercise library using your daily check-in, your
@@ -49,6 +54,50 @@ be exported or imported as JSON.
 - **History** with streak, weekly totals, 14-day chart, session type breakdown
   (micro / short / full / deep), minutes by body area, most practised exercises and a
   browsable log of every session and the stretches in it.
+
+### Demonstrations
+
+Every stretch is shown as an animated figure rather than a wall of text. The
+figures are drawn from a small kinematic model (`src/figure`): each exercise is
+a set of keyframes over joint angles, with side and front views and props for a
+chair, wall, desk, mat, foam roller, massage ball and band. They are original
+vector drawings, so they work offline, follow the light and dark theme, scale to
+any size and respect `prefers-reduced-motion`. The session screen leads with the
+animation, a large timer and a single movement cue; the written steps sit behind
+a toggle.
+
+## Workout
+
+A strength-training side built on the open
+[exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset) project:
+1,324 exercises with body part, equipment, target muscle and step-by-step
+instructions.
+
+- **Twelve workout types**: Full Body, Upper, Lower, Push, Pull, Legs, Posture &
+  Upper Back, Core, Arms, Quick Bodyweight, Quick Core and Cardio.
+- **Plan generator** that fills a time budget round-robin across the template's
+  blocks, so a 20-minute and a 60-minute session are both balanced. It respects
+  the equipment you have, avoids what you trained in the last few days, prefers
+  favourites, and leaves out advanced calisthenics skills, partner drills and
+  stretching entries (the mobility side covers those).
+- **Neck-friendly mode**, on by default, which removes behind-the-neck presses,
+  upright rows and similar loading.
+- **Mobility warm-up and cool-down** drawn from the stretch library, so each
+  workout opens with neck and upper-back work.
+- **Session player** with per-set reps and weight logging, an automatic rest
+  timer, swaps mid-session, and a summary with effort and notes.
+- **History** with streak, weekly volume, a 14-day chart, volume by body area and
+  best sets per exercise.
+
+### Exercise media
+
+Exercise text and metadata come from the dataset project and are MIT licensed, so
+they are bundled here. The animations and thumbnails are **not** bundled: they are
+© [Gym visual](https://gymvisual.com/) and are loaded at their original 180x180
+size from the dataset repository's own CDN, with the attribution shown wherever
+they appear. Lists use the small still image and only the player and detail view
+load the animation, which keeps browsing light. If the media host cannot be
+reached the app degrades to the exercise name rather than breaking.
 
 ## Development
 
